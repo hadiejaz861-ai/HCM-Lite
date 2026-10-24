@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCM Lite | Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+        header {
+            background: #172554;
+            color: white;
+            padding: 24px 6%;
+        }
+        header h1 { margin: 0 0 6px; }
+        header p { margin: 0; color: #cbd5e1; }
+        nav {
+            background: white;
+            padding: 16px 6%;
+            display: flex;
+            gap: 22px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        a { color: #1d4ed8; text-decoration: none; font-weight: bold; }
+        main { max-width: 1250px; margin: 30px auto; padding: 0 20px; }
+        h2 { margin-top: 30px; }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+        }
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0f172a0d;
+            border: 1px solid #e2e8f0;
+        }
+        .card p { color: #64748b; margin: 0 0 14px; }
+        .number { font-size: 32px; font-weight: bold; color: #172554; }
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
+        }
+        .action {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .action p { color: #64748b; font-weight: normal; }
+        .panel {
+            margin-top: 25px;
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th { color: #64748b; }
+        footer { text-align: center; color: #64748b; padding: 25px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>HCM Lite</h1>
+    <p>Human Capital Management System</p>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/companies/">Companies</a>
+    <a href="/employees/">Employees</a>
+    <a href="/admin/core/attendance/">Attendance</a>
+    <a href="/admin/core/leaverequest/">Leave Requests</a>
+    <a href="/admin/core/payroll/">Payroll</a>
+    <a href="/admin/">Admin Login</a>
+    <a href="/logout/">Logout</a>
+</nav>
+
+<main>
+    <h2>Dashboard Overview</h2>
+    <div class="cards">
+        <div class="card">
+            <p>Companies</p>
+            <div class="number">{{ company_count }}</div>
+        </div>
+        <div class="card">
+            <p>Total Employees</p>
+            <div class="number">{{ employee_count }}</div>
+        </div>
+        <div class="card">
+            <p>Active Employees</p>
+            <div class="number">{{ active_count }}</div>
+        </div>
+        <div class="card">
+            <p>Attendance Records</p>
+            <div class="number">{{ attendance_count }}</div>
+        </div>
+        <div class="card">
+            <p>Pending Leaves</p>
+            <div class="number">{{ pending_leaves }}</div>
+        </div>
+        <div class="card">
+            <p>Approved Leaves</p>
+            <div class="number">{{ approved_leaves }}</div>
+        </div>
+        <div class="card">
+            <p>Payroll Records</p>
+            <div class="number">{{ payroll_count }}</div>
+        </div>
+    </div>
+
+    <h2>Quick Actions</h2>
+    <div class="actions">
+        <div class="action">
+            <a href="/companies/">Manage Company</a>
+            <p>Set up your company information.</p>
+        </div>
+        <div class="action">
+            <a href="/employees/">Manage Employees</a>
+            <p>Add and manage employee profiles.</p>
+        </div>
+        <div class="action">
+            <a href="/admin/core/attendance/">Manage Attendance</a>
+            <p>Review attendance records.</p>
+        </div>
+        <div class="action">
+            <a href="/admin/core/leaverequest/">Manage Leave Requests</a>
+            <p>Review and approve leave requests.</p>
+        </div>
+        <div class="action">
+            <a href="/admin/core/payroll/">Manage Payroll</a>
+            <p>View and manage payroll records.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Recent Leave Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in recent_leaves %}
+                <tr>
+                    <td>{{ leave.employee.name }}</td>
+                    <td>{{ leave.start_date }}</td>
+                    <td>{{ leave.end_date }}</td>
+                    <td>{{ leave.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No leave requests yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>HCM Lite — Human Capital Management System</footer>
+</body>
+</html>
+

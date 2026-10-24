@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management | HCM Lite</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #172554;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 16px;
+            border-radius: 7px;
+            text-decoration: none;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px #0f172a0d;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            color: #172554;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 25px;
+        }
+
+        .submit-row {
+            margin-top: 22px;
+        }
+
+        .messages {
+            padding: 12px 15px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 7px;
+            margin-bottom: 18px;
+        }
+
+        .errorlist {
+            color: #b91c1c;
+            font-size: 13px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .empty {
+            color: #64748b;
+            text-align: center;
+            padding: 25px;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>Employee Management</h1>
+            <p class="subtitle">Add and manage your company employees.</p>
+        </div>
+
+        <a href="/" class="button">Back to Dashboard</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="messages">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="panel">
+        <h2>Add New Employee</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="form-grid">
+                {% for field in form %}
+                    {% if field.name != "is_active" %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <div class="errorlist">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="checkbox-row">
+                {{ form.is_active }}
+                <label for="{{ form.is_active.id_for_label }}">
+                    Active Employee
+                </label>
+            </div>
+
+            <div class="submit-row">
+                <button type="submit" class="button">
+                    Add Employee
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Employee Directory</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Job Title</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.name }}</td>
+                            <td>{{ employee.email }}</td>
+                            <td>{{ employee.company|default:"Not assigned" }}</td>
+                            <td>{{ employee.job_title }}</td>
+                            <td>{{ employee.department }}</td>
+                            <td>{{ employee.role }}</td>
+                            <td>
+                                {% if employee.is_active %}
+                                    Active
+                                {% else %}
+                                    Inactive
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty">
+                                No employees added yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+</body>
+</html>

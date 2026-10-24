@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payroll | HCM Lite</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fb; padding: 25px; color: #1f2937; }
+        main { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; }
+        h1 { color: #1d4ed8; }
+        input, select, button { padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; }
+        button { background: #2563eb; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+        th { background: #eff6ff; }
+        .message { padding: 10px; background: #eff6ff; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Payroll Management</h1>
+    <p><a href="/">← Dashboard</a></p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Create Monthly Payroll</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label>Employee</label><br>
+        <select name="employee_id" required>
+            <option value="">Select employee</option>
+            {% for employee in employees %}
+                <option value="{{ employee.id }}">{{ employee.name }} — {{ employee.salary }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Month</label><br>
+        <select name="month" required>
+            <option value="">Select month</option>
+            <option value="1">January</option><option value="2">February</option>
+            <option value="3">March</option><option value="4">April</option>
+            <option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">October</option>
+            <option value="11">November</option><option value="12">December</option>
+        </select><br>
+
+        <label>Year</label><br>
+        <input type="number" name="year" min="2000" max="2100" value="{{ now_year }}" required><br>
+        <label>Bonus</label><br>
+        <input type="number" name="bonus" min="0" step="0.01" value="0" required><br>
+        <label>Deductions</label><br>
+        <input type="number" name="deductions" min="0" step="0.01" value="0" required><br>
+        <button type="submit">Create Payroll</button>
+    </form>
+
+    <h2>Payroll Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th><th>Month</th><th>Year</th>
+                <th>Basic Salary</th><th>Bonus</th><th>Deductions</th>
+                <th>Net Salary</th><th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for payroll in payrolls %}
+            <tr>
+                <td>{{ payroll.employee.name }}</td>
+                <td>{{ payroll.month }}</td>
+                <td>{{ payroll.year }}</td>
+                <td>{{ payroll.basic_salary }}</td>
+                <td>{{ payroll.bonus }}</td>
+                <td>{{ payroll.deductions }}</td>
+                <td>{{ payroll.net_salary }}</td>
+                <td>{{ payroll.status }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="8">No payroll records found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

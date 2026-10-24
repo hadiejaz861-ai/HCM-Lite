@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance | HCM Lite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            margin: 0;
+            padding: 30px;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000010;
+        }
+        h1 { color: #1d4ed8; }
+        .form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        select, button {
+            padding: 11px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        .checkout { background: #15803d; }
+        .checkout:hover { background: #166534; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        th { background: #eff6ff; }
+        .message { padding: 10px; background: #eff6ff; margin: 8px 0; }
+        .back { display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Attendance Management</h1>
+    <p>Date: {{ today }}</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Employee Check-In / Check-Out</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <select name="employee_id" required>
+                <option value="">Select Employee</option>
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}">
+                        {{ employee.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" name="action" value="check_in">
+                Check In
+            </button>
+
+            <button type="submit" name="action" value="check_out" class="checkout">
+                Check Out
+            </button>
+        </div>
+    </form>
+
+    <h2>Today's Attendance Records</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Status</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                    <td>{{ record.employee.name }}</td>
+                    <td>{{ record.status }}</td>
+                    <td>{{ record.check_in|default:"—" }}</td>
+                    <td>{{ record.check_out|default:"—" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No attendance records for today.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="back" href="/">← Back to Dashboard</a>
+</div>
+</body>
+</html>

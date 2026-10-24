@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Leave Management | HCM Lite</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fb; padding: 25px; color: #1f2937; }
+        main { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; }
+        h1 { color: #1d4ed8; }
+        input, textarea, select, button { padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; }
+        button { background: #2563eb; color: white; cursor: pointer; border: none; }
+        .approve { background: #15803d; }
+        .reject { background: #b91c1c; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+        th { background: #eff6ff; }
+        .message { padding: 10px; background: #eff6ff; }
+        .review-form { display: flex; gap: 5px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Leave Management</h1>
+    <p><a href="/">← Dashboard</a></p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if employee and employee.role == "Employee" %}
+    <h2>Apply for Leave</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="submit_leave">
+        <label>Start date</label><br>
+        <input type="date" name="start_date" required><br>
+        <label>End date</label><br>
+        <input type="date" name="end_date" required><br>
+        <label>Reason</label><br>
+        <textarea name="reason" rows="3" required maxlength="2000"></textarea><br>
+        <button type="submit">Submit Request</button>
+    </form>
+    {% endif %}
+
+    <h2>{% if manager %}All Leave Requests{% else %}My Leave Requests{% endif %}</h2>
+    <table>
+        <thead>
+            <tr>
+                {% if manager %}<th>Employee</th>{% endif %}
+                <th>Start</th><th>End</th><th>Reason</th><th>Status</th>
+                {% if manager %}<th>Action</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for leave in leaves %}
+            <tr>
+                {% if manager %}<td>{{ leave.employee.name }}</td>{% endif %}
+                <td>{{ leave.start_date }}</td>
+                <td>{{ leave.end_date }}</td>
+                <td>{{ leave.reason }}</td>
+                <td>{{ leave.status }}</td>
+                {% if manager %}
+                <td>
+                    {% if leave.status == "Pending" %}
+                    <form method="post" class="review-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_leave">
+                        <input type="hidden" name="leave_id" value="{{ leave.id }}">
+                        <button class="approve" name="status" value="Approved">Approve</button>
+                        <button class="reject" name="status" value="Rejected">Reject</button>
+                    </form>
+                    {% else %}Reviewed{% endif %}
+                </td>
+                {% endif %}
+            </tr>
+        {% empty %}
+            <tr><td colspan="6">No leave requests found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</main>
+</body>
+</html>
